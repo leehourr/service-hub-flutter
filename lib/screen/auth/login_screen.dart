@@ -45,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       TextFormField(
                         controller: usernameController,
                         decoration: const InputDecoration(
-                          labelText: 'Username',
+                          labelText: 'Email or username',
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.black),
                           ),
@@ -55,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter a username';
+                            return 'Please enter a email or username';
                           }
                           return null;
                         },
@@ -77,6 +77,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           if (value == null || value.isEmpty) {
                             return 'Please enter a password';
                           }
+                          // Check if the password is 8 characters or longer
+                          if (value.length < 8) {
+                            return 'Password must be 8 characters or longer';
+                          }
+                          // Check if the password includes at least one numeric character
+                          if (!RegExp(r'\d').hasMatch(value)) {
+                            return 'Password must include at least one numeric character';
+                          }
                           return null;
                         },
                       ),
@@ -87,7 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: TextButton(
                           onPressed: () {
                             // Handle forget password action
-                            log('Forget Password clicked');
+                            // print('Forget Password clicked');
                           },
                           child: const Text(
                             'Forget Password?',
@@ -111,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             final password = passwordController.text;
 
                             // Replace this with your authentication logic
-                            log('Username: $username, Password: $password');
+                            // print('Username: $username, Password: $password');
                           }
                         },
                         child: const Text(
@@ -141,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               // padding: const EdgeInsets.all(2.0),
                               tooltip: 'Phone',
                               onPressed: () {
-                                log('Phone authentication clicked');
+                                // print('Phone authentication clicked');
                               },
                             ),
                           ),
@@ -158,7 +166,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               // padding: const EdgeInsets.all(2.0),
                               tooltip: 'Google',
                               onPressed: () {
-                                log('Google authentication clicked');
+                                // print('Google authentication clicked');
                               },
                             ),
                           ),
@@ -179,7 +187,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           InkWell(
                             onTap: () {
                               // Handle signup action
-                              log('Signup clicked');
+                              // print('Signup clicked');
                             },
                             child: const Text(
                               ' Signup',
