@@ -80,6 +80,7 @@ class _SignupScreenState extends State<SignupScreen> {
     return Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
+          scrolledUnderElevation: 0.0,
           automaticallyImplyLeading: false,
         ),
         body: SingleChildScrollView(
