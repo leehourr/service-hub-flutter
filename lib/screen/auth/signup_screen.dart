@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:service_hub/screen/auth/login_screen.dart';
@@ -55,7 +54,7 @@ class _SignupScreenState extends State<SignupScreen> {
         showErrorMessage(body['errMessage']);
       }
     } catch (e, stackTrace) {
-      showErrorMessage('An error occurred: $e');
+      // showErrorMessage('An error occurred: $e');
       logger.e('An error occurred: $e');
       logger.e(stackTrace);
     } finally {
@@ -79,12 +78,20 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           automaticallyImplyLeading: false,
         ),
         body: SingleChildScrollView(
+          reverse: true,
+          // keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Padding(
-            padding: const EdgeInsets.all(30),
+            padding: EdgeInsets.fromLTRB(
+              30.0,
+              30.0,
+              30.0,
+              MediaQuery.of(context).viewInsets.bottom,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -254,6 +261,10 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
 
                       const SizedBox(height: 10.0),
+                      // Padding(
+                      //     padding: EdgeInsets.only(
+                      //         bottom:
+                      //             MediaQuery.of(context).viewInsets.bottom)),
                       const Align(
                           alignment: Alignment.center, child: Text('Or')),
                       const SizedBox(height: 10.0),

@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:logger/logger.dart';
 import 'package:service_hub/screen/auth/signup_screen.dart';
+import 'package:service_hub/service/api_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,10 +14,64 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController usernameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController _accountController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  var logger = Logger();
+  bool _isLoading = false;
+
+  final ApiService apiService = ApiService();
 
   @override
+  void dispose() {
+    _accountController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _login() async {
+    // print('Sign Up button pressed');
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+      final response = await apiService.login(
+        account: _accountController.text,
+        password: _passwordController.text,
+      );
+      // print(response.body);
+      final Map<String, dynamic> body = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        logger.e('Login successful ${json.encode(body)}');
+        logger.e('Login successful');
+      } else {
+        // logger.e(response.body);
+
+        showErrorMessage(body['errMessage']);
+      }
+    } catch (e, stackTrace) {
+      // showErrorMessage('An error occurred: $e');
+      logger.e('An error occurred: $e');
+      logger.e(stackTrace);
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void showErrorMessage(String errorMessage) {
+    BuildContext currentContext = context;
+
+    ScaffoldMessenger.of(currentContext).showSnackBar(
+      SnackBar(
+        content: Text(errorMessage),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,9 +98,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Column(
                     children: [
                       TextFormField(
-                        controller: usernameController,
+                        controller: _accountController,
                         decoration: const InputDecoration(
-                          labelText: 'Email or username',
+                          labelText: 'Phone or username',
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.black),
                           ),
@@ -53,14 +110,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter a email or username';
+                            return 'Please enter a phone or username';
                           }
                           return null;
                         },
                       ),
                       const SizedBox(height: 16.0),
                       TextFormField(
-                        controller: passwordController,
+                        controller: _passwordController,
                         obscureText: true,
                         decoration: const InputDecoration(
                           labelText: 'Password',
@@ -110,20 +167,31 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           minimumSize: const Size.fromHeight(45),
                         ),
-                        onPressed: () {
-                          if (_formKey.currentState?.validate() ?? false) {
-                            // Validation passed, handle login
-                            final username = usernameController.text;
-                            final password = passwordController.text;
-
-                            // Replace this with your authentication logic
-                            // print('Username: $username, Password: $password');
-                          }
-                        },
-                        child: const Text(
-                          'Login',
-                          style: TextStyle(color: Colors.white),
-                        ),
+                        onPressed: _isLoading
+                            ? null
+                            : () {
+                                if (_formKey.currentState?.validate() ??
+                                    false) {
+                                  _login();
+                                }
+                              },
+                        child: _isLoading
+                            ? const Center(
+                                child: SizedBox(
+                                  width: 24.0,
+                                  height: 24.0,
+                                  child: CircularProgressIndicator(
+                                    backgroundColor: Colors.black,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white),
+                                    strokeWidth: 2.0,
+                                  ),
+                                ),
+                              )
+                            : const Text(
+                                'Login',
+                                style: TextStyle(color: Colors.white),
+                              ),
                       ),
 
                       const SizedBox(height: 16.0),

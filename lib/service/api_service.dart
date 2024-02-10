@@ -13,9 +13,9 @@ class ApiService {
     required String password,
   }) async {
     final url = Uri.http(baseUrl, '/api/v1/signup');
-    print('Name: $name');
-    print('Phone Number: $phoneNumber');
-    print('Password: $password');
+    // print('Name: $name');
+    // print('Phone Number: $phoneNumber');
+    // print('Password: $password');
     try {
       final response = await http.post(
         url,
@@ -26,6 +26,33 @@ class ApiService {
           'name': name.trim(),
           'phone_number': phoneNumber.trim(),
           'account_type': 'client',
+          'password': password.trim(),
+        }),
+      );
+      return response;
+    } catch (e) {
+      // Handle errors or exceptions as needed
+      print('Error: $e');
+      throw Exception(e);
+    }
+  }
+
+  Future<http.Response> login({
+    required String account,
+    required String password,
+  }) async {
+    final url = Uri.http(baseUrl, '/api/v1/login');
+    // print('Name: $name');
+    // print('Phone Number: $phoneNumber');
+    // print('Password: $password');
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          'account': account.trim(),
           'password': password.trim(),
         }),
       );
