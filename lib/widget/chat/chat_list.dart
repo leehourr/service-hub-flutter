@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:service_hub/service/api_service.dart';
-import 'package:service_hub/widget/chat/chatlist_item.dart';
+import 'package:service_hub/widget/chat/chat_item.dart';
 
 class ChatList extends StatefulWidget {
   const ChatList({super.key});
@@ -69,7 +69,7 @@ class _ChatListState extends State<ChatList> {
         itemCount: _chatList.length,
         itemBuilder: (context, index) {
           final chat = _chatList[index];
-          return ChatListItem(
+          return ChatItem(
             name: chat['name'],
             lastText: chat['last_text'],
             chatId: chat['chat_id'],

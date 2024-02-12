@@ -159,6 +159,7 @@ class ApiService {
   }) async {
     final url = Uri.http(baseUrl, 'api/v1/send-chat/$userId');
     try {
+      String? token = await _getSavedToken();
       final response = await http.post(
         url,
         headers: {

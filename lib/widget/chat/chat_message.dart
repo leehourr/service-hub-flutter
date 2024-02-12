@@ -17,7 +17,7 @@ class ChatMessage extends StatelessWidget {
     final messageText = message;
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 10.0),
+      margin: const EdgeInsets.symmetric(vertical: 5.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment:
@@ -45,14 +45,14 @@ class ChatMessage extends StatelessWidget {
             ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
               child: Row(
                 mainAxisAlignment:
                     isYou ? MainAxisAlignment.end : MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
-                    margin: const EdgeInsets.only(top: 5.0),
+                    // margin: const EdgeInsets.only(top: 8.0),
                     child: _buildMessage(messageText, isYou),
                   ),
                 ],

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:service_hub/screen/chat_screen.dart';
 
-class ChatListItem extends StatelessWidget {
-  const ChatListItem({
+class ChatItem extends StatelessWidget {
+  const ChatItem({
     super.key,
     required this.name,
     required this.chatId,
@@ -19,7 +20,21 @@ class ChatListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-        type: MaterialType.transparency,
+      type: MaterialType.transparency,
+      child: InkWell(
+        onTap: () {
+          // Navigate to ChatScreen on tap
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChatScreen(
+                senderName: name,
+                senderId: senderId,
+                chatId: chatId,
+              ),
+            ),
+          );
+        },
         child: Container(
           margin: const EdgeInsets.all(8.0),
           padding: const EdgeInsets.all(8.0),
@@ -56,7 +71,6 @@ class ChatListItem extends StatelessWidget {
                         color: Colors.black,
                       ),
                     ),
-                    // const SizedBox(height: 0.0),
                     Text(
                       lastText,
                       style: const TextStyle(fontSize: 14, color: Colors.black),
@@ -68,6 +82,8 @@ class ChatListItem extends StatelessWidget {
               ),
             ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 }

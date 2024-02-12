@@ -1,9 +1,8 @@
-import 'dart:convert';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:service_hub/service/api_service.dart';
+import 'package:service_hub/widget/chat/chat_item.dart';
+import 'package:service_hub/widget/chat/chat_list.dart';
 import 'package:service_hub/widget/chat/chat_message.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:service_hub/service/pusher_channel.dart';
@@ -11,7 +10,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
+  const ChatScreen(
+      {super.key,
+      required this.senderName,
+      required this.senderId,
+      required this.chatId});
+
+  final String senderName;
+  final int senderId;
+  final int chatId;
 
   @override
   State<ChatScreen> createState() => ChatScreenState();
@@ -23,7 +30,6 @@ class ChatScreenState extends State<ChatScreen> {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   // final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   late int userId;
-  late int senderId;
   late String _token;
   late String _name;
 
@@ -88,6 +94,7 @@ class ChatScreenState extends State<ChatScreen> {
       }
       _isButtonDisabled = true;
     });
+    // Navigator.pop(context);
   }
 
   void _sendMessage(String messageText) async {
@@ -107,6 +114,7 @@ class ChatScreenState extends State<ChatScreen> {
       // For example, you can check if the response was successful
       if (response.statusCode == 200) {
         _handleNewMessage([messageText], true);
+
         logger.e('Message sent successfully');
       } else {
         // Handle the case when the message sending fails
@@ -156,34 +164,52 @@ class ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            child: NotificationListener<ScrollNotification>(
-              onNotification: (notification) {
-                if (notification is ScrollEndNotification) {
-                  FocusScope.of(context).requestFocus(FocusNode());
-                }
-                return false;
-              },
-              child: ListView.builder(
-                reverse: true,
-                itemCount: _messages.length,
-                itemBuilder: (context, index) {
-                  return _messages[index];
-                },
-              ),
+    // Navigator.pop(context, true);
+    return PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) {
+          if (didPop) {
+            return;
+          }
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ChatList(),
             ),
+          );
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(widget.senderName),
+            centerTitle: true,
+            // You can customize other properties of the AppBar here
           ),
-          // const Divider(height: 1.0),
-          Container(
-            // decoration: BoxDecoration(color: Theme.of(context).cardColor),
-            child: _buildTextComposer(),
+          body: Column(
+            children: <Widget>[
+              Expanded(
+                child: NotificationListener<ScrollNotification>(
+                  onNotification: (notification) {
+                    if (notification is ScrollEndNotification) {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                    }
+                    return false;
+                  },
+                  child: ListView.builder(
+                    reverse: true,
+                    itemCount: _messages.length,
+                    itemBuilder: (context, index) {
+                      return _messages[index];
+                    },
+                  ),
+                ),
+              ),
+              // const Divider(height: 1.0),
+              Container(
+                child: _buildTextComposer(),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+        ));
   }
 
   Widget _buildTextComposer() {

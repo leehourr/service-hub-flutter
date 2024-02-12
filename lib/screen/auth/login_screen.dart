@@ -59,7 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
         logger.e('Login successful $accessToken');
         logger.e('Login successful');
 
-        _navigateToChatScreen();
+        // _navigateToChatScreen();
       } else {
         // logger.e(response.body);
 
@@ -76,14 +76,14 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void _navigateToChatScreen() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const ChatScreen(),
-      ),
-    );
-  }
+  // void _navigateToChatScreen() {
+  //   Navigator.pushReplacement(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (context) => const ChatScreen(),
+  //     ),
+  //   );
+  // }
 
   void showErrorMessage(String errorMessage) {
     BuildContext currentContext = context;
