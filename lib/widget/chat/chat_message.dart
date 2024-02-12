@@ -32,12 +32,6 @@ class ChatMessage extends StatelessWidget {
                 children: [
                   Container(
                     padding: const EdgeInsets.fromLTRB(10.0, 0, 0, 0),
-                    // width: 30.0, // Set the width
-                    // height: 30.0, // Set the height
-                    // decoration: BoxDecoration(
-                    //   color: Colors.black,
-                    //   borderRadius: BorderRadius.circular(40.0),
-                    // ),
                     child: Text(
                       senderName.isNotEmpty ? senderName[0].toUpperCase() : '',
                       style: const TextStyle(
@@ -59,7 +53,7 @@ class ChatMessage extends StatelessWidget {
                 children: [
                   Container(
                     margin: const EdgeInsets.only(top: 5.0),
-                    child: _buildMessageText(messageText, isYou),
+                    child: _buildMessage(messageText, isYou),
                   ),
                 ],
               ),
@@ -70,72 +64,31 @@ class ChatMessage extends StatelessWidget {
     );
   }
 
-  Widget _buildMessageText(dynamic messageText, bool isYou) {
-    if (messageText is String) {
-      // If it's a string, return a Text widget
-      return Align(
-        alignment: isYou ? Alignment.topRight : Alignment.topLeft,
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            vertical: 8.0,
-            horizontal: 12.0,
-          ),
-          decoration: BoxDecoration(
-            color: isYou ? Colors.black : null,
-            borderRadius: BorderRadius.circular(12.0),
-            border: isYou
-                ? null
-                : Border.all(
-                    color: Colors.black,
-                  ),
-          ),
-          child: Text(
-            messageText,
+  Widget _buildMessage(String message, bool isYou) {
+    return Container(
+      constraints: const BoxConstraints(
+        maxWidth: 250.0, // Set your preferred maximum width
+      ),
+      padding: const EdgeInsets.symmetric(
+        vertical: 8.0,
+        horizontal: 15.0,
+      ),
+      decoration: BoxDecoration(
+        color: isYou ? Colors.black : Colors.grey[300],
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: Wrap(
+        children: [
+          Text(
+            message,
             style: TextStyle(
               color: isYou ? Colors.white : Colors.black,
             ),
-            textAlign: isYou ? TextAlign.end : TextAlign.start,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 10,
           ),
-        ),
-      );
-    } else if (messageText is List<String>) {
-      // If it's a list of strings, display each string in a column
-      return Column(
-        crossAxisAlignment:
-            isYou ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-        children: messageText
-            .map(
-              (text) => Align(
-                alignment: isYou ? Alignment.topRight : Alignment.topLeft,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 8.0,
-                    horizontal: 12.0,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isYou ? Colors.black : null,
-                    borderRadius: BorderRadius.circular(12.0),
-                    border: isYou
-                        ? null
-                        : Border.all(
-                            color: Colors.black,
-                          ),
-                  ),
-                  child: Text(
-                    text,
-                    style: TextStyle(
-                      color: isYou ? Colors.white : Colors.black,
-                    ),
-                    textAlign: isYou ? TextAlign.end : TextAlign.start,
-                  ),
-                ),
-              ),
-            )
-            .toList(),
-      );
-    } else {
-      // Handle other types or return an empty container
-      return Container();
-    }
+        ],
+      ),
+    );
   }
 }
