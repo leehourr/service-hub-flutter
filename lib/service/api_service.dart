@@ -59,7 +59,25 @@ class ApiService {
       return response;
     } catch (e) {
       // Handle errors or exceptions as needed
-      print('Error: $e');
+      // print('Error: $e');
+      throw Exception(e);
+    }
+  }
+
+  Future<http.Response> viewChat({
+    required int chatId,
+    required int userId,
+  }) async {
+    final url = Uri.http(baseUrl, '/api/chat-list/$chatId/$userId');
+    // print('Name: $name');
+    // print('Phone Number: $phoneNumber');
+    // print('Password: $password');
+    try {
+      final response = await http.get(url, headers: {
+        'Content-Type': 'application/json',
+      });
+      return response;
+    } catch (e) {
       throw Exception(e);
     }
   }

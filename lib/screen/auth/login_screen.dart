@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:logger/logger.dart';
 import 'package:service_hub/screen/auth/signup_screen.dart';
+import 'package:service_hub/screen/chat_screen.dart';
 import 'package:service_hub/service/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -33,16 +34,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _login() async {
     // print('Sign Up button pressed');
+    // BuildContext currentContext = context;
     try {
       setState(() {
         _isLoading = true;
         count++;
       });
-      if (count > 1) {
-        final String? getToken = await _getSavedToken();
-        logger.e('access token $getToken');
-        return;
-      }
+
+      //test if the session correctly saved in local storage
+      // if (count > 1) {
+      //   final String? getToken = await _getSavedToken();
+      //   logger.e('access token $getToken');
+      //   return;
+      // }
       final response = await apiService.login(
         account: _accountController.text,
         password: _passwordController.text,
@@ -54,6 +58,8 @@ class _LoginScreenState extends State<LoginScreen> {
         await _saveTokenToSharedPreferences(accessToken);
         logger.e('Login successful $accessToken');
         logger.e('Login successful');
+
+        _navigateToChatScreen();
       } else {
         // logger.e(response.body);
 
@@ -70,6 +76,15 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _navigateToChatScreen() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ChatScreen(),
+      ),
+    );
+  }
+
   void showErrorMessage(String errorMessage) {
     BuildContext currentContext = context;
 
@@ -79,17 +94,6 @@ class _LoginScreenState extends State<LoginScreen> {
         backgroundColor: Colors.red,
       ),
     );
-  }
-
-  Future<String?> _getSavedToken() async {
-    try {
-      final SharedPreferences prefs = await _prefs;
-      final String? token = prefs.getString('jwt_token');
-      return token;
-    } catch (e) {
-      logger.e("error getting token $e");
-      return null;
-    }
   }
 
   Future<void> _saveTokenToSharedPreferences(String accessToken) async {
