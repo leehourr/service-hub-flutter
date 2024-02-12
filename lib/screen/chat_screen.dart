@@ -1,11 +1,14 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:service_hub/service/api_service.dart';
 import 'package:service_hub/widget/chat/chat_message.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:service_hub/service/pusher_channel.dart';
 // import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:jwt_decode/jwt_decode.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -20,76 +23,118 @@ class ChatScreenState extends State<ChatScreen> {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   // final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   late int userId;
+  late int senderId;
+  late String _token;
+  late String _name;
+
   bool _isButtonDisabled = true;
   var logger = Logger();
+
+  late ApiService _apiService;
 
   @override
   void initState() {
     super.initState();
-    // _initFirebaseMessaging();
+    // _apiService = ApiService(token: _token);
+    _initStateAsync();
   }
 
-  // void _requestPermissionsAndConfigure() async {
-  //   NotificationSettings settings = await _firebaseMessaging.requestPermission(
-  //     alert: true,
-  //     badge: true,
-  //     sound: true,
-  //   );
+  Future<void> _initStateAsync() async {
+    await _getUserId();
+    _apiService = ApiService(token: _token);
+    await _loadChat();
+    // _loadChat(); // Call your API to load chat messages
+  }
 
-  //   if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-  //     logger.e('User granted permission');
-  //   } else {
-  //     logger.e('User declined or has not yet granted permission');
-  //   }
-  // }
+  Future<void> _getUserId() async {
+    String? token = await _getSavedToken();
+    if (token != null) {
+      try {
+        Map<String, dynamic> decodedToken = Jwt.parseJwt(token);
+        Map<String, dynamic> userData = decodedToken['data'];
+        setState(() {
+          userId = userData['id'];
+          _name = userData['name'];
+          _token = token;
+        });
+      } catch (e) {
+        logger.e("Error decoding token: $e");
+      }
+    }
+  }
 
-  // void _initFirebaseMessaging() {
-  //   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-  //     // Handle foreground messages
-  //     logger.e("Received foreground message: $message");
-  //   });
+  Future<void> _loadChat() async {
+    _apiService
+        .getChatStream(chatId: 18, userId: userId, token: _token)
+        .listen((List<ChatMessage> messages) {
+      setState(() {
+        _messages.clear();
+        _messages.addAll(messages.reversed);
+      });
+    });
+  }
 
-  //   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-  //     // Handle messages opened from the app's closed state
-  //     logger.e("Opened app from terminated state: $message");
-  //   });
-
-  //   // You can also handle other events like onBackgroundMessage, etc.
-
-  //   // _requestPermissionsAndConfigure();
-  // }
-
-  void _handleNewMessage(String messageText, bool isYou) async {
-    ChatMessage message = ChatMessage(
-      text: messageText,
-      // For simplicity, we'll use a boolean to determine whether the message is from the user or not.
-      isYou: isYou,
-    );
+  void _handleNewMessage(List<String> messages, bool isYou) async {
     setState(() {
-      _messages.insert(0, message);
+      for (var message in messages) {
+        _messages.insert(
+          0,
+          ChatMessage(
+            message: message,
+            senderName: _name,
+            isYou: true,
+          ),
+        );
+      }
       _isButtonDisabled = true;
     });
   }
 
-  void _sendMessage(String messageText) {
-    // _logDecodedToken();
+  void _sendMessage(String messageText) async {
     if (messageText == "" || messageText.isEmpty) {
       return;
     }
-    _handleNewMessage(messageText, true);
-    // _initFirebaseMessaging();
-    // Clear the text field
+
+    try {
+      final response = await _apiService.sendMessage(
+        messageText: messageText,
+        senderId: userId,
+        chatId: 18,
+        userId: 4,
+      );
+
+      // Handle the response as needed
+      // For example, you can check if the response was successful
+      if (response.statusCode == 200) {
+        _handleNewMessage([messageText], true);
+        logger.e('Message sent successfully');
+      } else {
+        // Handle the case when the message sending fails
+        logger.e('Failed to send message. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Handle exceptions or errors
+      logger.e('Error sending message: $e');
+    }
+
     _textController.clear();
+    _loadChat();
   }
 
   // Future<void> _logDecodedToken() async {
   //   String? token = await _getSavedToken();
   //   if (token != null) {
   //     try {
-  //       final Map<String, dynamic> decodedToken =
-  //           json.decode(utf8.decode(base64.decode(token.split(".")[1])));
+  //       Map<String, dynamic> decodedToken = Jwt.parseJwt(token);
 
-  //       logger.e("Decoded Token: ${decodedToken['data']['username']}");
+  //       // Accessing user data from the decoded token
+  //       Map<String, dynamic> userData = decodedToken['data'];
+  //       // int userId = userData['id'];
+  //       // String phoneNumber = userData['phone_number'];
+  //       // String accountType = userData['account_type'];
+
+  //       // logger.e(
+  //       //     "Decoded Token - Username: $userId, Phone Number: $phoneNumber, Account Type: $accountType");
   //     } catch (e) {
   //       logger.e("Error decoding token: $e");
   //     }
@@ -100,6 +145,8 @@ class ChatScreenState extends State<ChatScreen> {
     try {
       final SharedPreferences prefs = await _prefs;
       final String? token = prefs.getString('jwt_token');
+      logger.e("Token: $token");
+
       return token;
     } catch (e) {
       logger.e("error getting token $e");

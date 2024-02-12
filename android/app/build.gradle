@@ -49,8 +49,13 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        
     }
 
+    lintOptions {
+        disable 'deprecation', 'unchecked'
+    }
+    
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
