@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:service_hub/screen/auth/login_screen.dart';
 import 'package:service_hub/screen/auth/signup_screen.dart';
 import 'package:service_hub/screen/chat_screen.dart';
+import 'package:service_hub/service/api_service.dart';
+import 'package:service_hub/widget/chat/chat_list.dart';
 // import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
@@ -12,12 +14,11 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: LoginScreen(),
+      home: ChatList(),
     );
   }
 }
