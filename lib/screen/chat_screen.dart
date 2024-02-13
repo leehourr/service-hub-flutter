@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:service_hub/service/api_service.dart';
-import 'package:service_hub/widget/chat/chat_item.dart';
+// import 'package:service_hub/widget/chat/chat_item.dart';
 import 'package:service_hub/widget/chat/chat_list.dart';
 import 'package:service_hub/widget/chat/chat_message.dart';
 import 'package:shared_preferences/shared_preferences.dart';

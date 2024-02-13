@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:jwt_decode/jwt_decode.dart';
+import 'package:logger/logger.dart';
+import 'package:service_hub/screen/auth/login_screen.dart';
+import 'package:service_hub/widget/auth/profile.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -9,6 +14,9 @@ class Home extends StatefulWidget {
 
 class _HomeScreenState extends State<Home> {
   int _currentIndex = 0;
+  var logger = Logger();
+  late String _name;
+  late String _number;
 
   @override
   Widget build(BuildContext context) {
@@ -54,9 +62,27 @@ class _HomeScreenState extends State<Home> {
             child: Text('Appointment Content',
                 style: TextStyle(color: Colors.black)));
       case 4:
-        return const Center(
-            child:
-                Text('Account Content', style: TextStyle(color: Colors.black)));
+        return FutureBuilder<bool>(
+          key: UniqueKey(),
+          future: _hasToken(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.data == true) {
+                return Center(
+                    child: Profile(
+                  name: _name,
+                  number: _number,
+                ));
+              } else {
+                return const Center(
+                  child: LoginScreen(),
+                );
+              }
+            }
+            // Loading state
+            return const Center(child: CircularProgressIndicator());
+          },
+        );
       default:
         return Container();
     }
@@ -67,5 +93,26 @@ class _HomeScreenState extends State<Home> {
       icon: Icon(icon),
       label: label,
     );
+  }
+
+  Future<bool> _hasToken() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('jwt_token');
+      if (token != null) {
+        Map<String, dynamic> decodedToken = Jwt.parseJwt(token);
+        final String name = decodedToken['data']['name'].toString();
+        final String number = decodedToken['data']['phone_number'].toString();
+
+        logger.e("token $token name $name $number");
+        _name = name;
+        _number = number;
+
+        return true;
+      }
+      return token != null;
+    } catch (e) {
+      return false;
+    }
   }
 }

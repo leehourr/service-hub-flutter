@@ -57,7 +57,7 @@ class _ChatListState extends State<ChatList> {
       }
     } catch (e) {
       // Handle error
-      print('Error loading token data: $e');
+      // print('Error loading token data: $e');
     }
   }
 

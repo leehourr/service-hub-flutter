@@ -70,7 +70,7 @@ class ApiService {
       return response;
     } catch (e) {
       // Handle errors or exceptions as needed
-      print('Error: $e');
+      // print('Error: $e');
       throw Exception(e);
     }
   }

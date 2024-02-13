@@ -5,6 +5,7 @@ import 'package:logger/logger.dart';
 import 'package:service_hub/screen/auth/signup_screen.dart';
 import 'package:service_hub/screen/chat_screen.dart';
 import 'package:service_hub/service/api_service.dart';
+import 'package:service_hub/widget/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -58,8 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
         await _saveTokenToSharedPreferences(accessToken);
         logger.e('Login successful $accessToken');
         logger.e('Login successful');
-
-        // _navigateToChatScreen();
+        _navigateToChatScreen();
       } else {
         // logger.e(response.body);
 
@@ -76,14 +76,14 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  // void _navigateToChatScreen() {
-  //   Navigator.pushReplacement(
-  //     context,
-  //     MaterialPageRoute(
-  //       builder: (context) => const ChatScreen(),
-  //     ),
-  //   );
-  // }
+  void _navigateToChatScreen() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const Home(),
+      ),
+    );
+  }
 
   void showErrorMessage(String errorMessage) {
     BuildContext currentContext = context;
