@@ -2,11 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:logger/logger.dart';
 import 'package:service_hub/screen/auth/login_screen.dart';
+import 'package:service_hub/screen/home_screen.dart';
 import 'package:service_hub/widget/auth/profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
-  const Home({super.key});
+  const Home({
+    super.key,
+  });
+  // static final GlobalKey<NavigatorState> navigatorKey =
+  //     GlobalKey<NavigatorState>();
+  // void navigateToAccountTab() {
+  //   navigatorKey.currentState?.pushNamed('Account');
+  // }
 
   @override
   State<Home> createState() => _HomeScreenState();
@@ -15,8 +23,41 @@ class Home extends StatefulWidget {
 class _HomeScreenState extends State<Home> {
   int _currentIndex = 0;
   var logger = Logger();
-  late String _name;
-  late String _number;
+  late String? _name = '';
+  late String? _number = '';
+  late bool? _isLogin = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initStateAsync();
+  }
+
+  Future<void> _initStateAsync() async {
+    await _hasToken();
+    setState(() {});
+  }
+
+  Future<bool> _hasToken() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('jwt_token');
+      if (token != null) {
+        Map<String, dynamic> decodedToken = Jwt.parseJwt(token);
+        final String name = decodedToken['data']['name'].toString();
+        final String number = decodedToken['data']['phone_number'].toString();
+
+        logger.e("token $token name $name $number");
+        _name = name;
+        _number = number;
+        _isLogin = true;
+        return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,8 +88,19 @@ class _HomeScreenState extends State<Home> {
   Widget _buildTabView() {
     switch (_currentIndex) {
       case 0:
-        return const Center(
-            child: Text('Home Content', style: TextStyle(color: Colors.black)));
+        _hasToken();
+        return Center(
+          child: HomeScreen(
+            userName: _name!,
+            isLogin: _isLogin!,
+            navigateToAccount: () {
+              setState(() {
+                _currentIndex = 4;
+              });
+            },
+          ),
+        );
+
       case 1:
         return const Center(
             child:
@@ -70,8 +122,8 @@ class _HomeScreenState extends State<Home> {
               if (snapshot.data == true) {
                 return Center(
                     child: Profile(
-                  name: _name,
-                  number: _number,
+                  name: _name ?? "",
+                  number: _number ?? '',
                 ));
               } else {
                 return const Center(
@@ -93,26 +145,5 @@ class _HomeScreenState extends State<Home> {
       icon: Icon(icon),
       label: label,
     );
-  }
-
-  Future<bool> _hasToken() async {
-    try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final String? token = prefs.getString('jwt_token');
-      if (token != null) {
-        Map<String, dynamic> decodedToken = Jwt.parseJwt(token);
-        final String name = decodedToken['data']['name'].toString();
-        final String number = decodedToken['data']['phone_number'].toString();
-
-        logger.e("token $token name $name $number");
-        _name = name;
-        _number = number;
-
-        return true;
-      }
-      return token != null;
-    } catch (e) {
-      return false;
-    }
   }
 }

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
+import 'package:service_hub/widget/home.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Profile extends StatelessWidget {
   const Profile({super.key, required this.name, required this.number});
@@ -8,6 +11,28 @@ class Profile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+    var logger = Logger();
+
+    void navigateToHome() {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const Home(),
+        ),
+      );
+    }
+
+    Future<void> _signOut() async {
+      try {
+        final SharedPreferences prefs = await _prefs;
+        await prefs.remove('jwt_token');
+        navigateToHome();
+      } catch (e) {
+        logger.e('Error signing out: $e');
+      }
+    }
+
     // Mock data - Replace with actual data from token
     return Scaffold(
       appBar: AppBar(
@@ -96,9 +121,7 @@ class Profile extends StatelessWidget {
             // const Spacer(),
             // Sign out clickable text
             GestureDetector(
-              onTap: () {
-                // Add functionality for signing out
-              },
+              onTap: _signOut,
               child: const Text(
                 'Sign Out',
                 style: TextStyle(

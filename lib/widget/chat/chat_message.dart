@@ -5,10 +5,12 @@ class ChatMessage extends StatelessWidget {
     super.key,
     required this.message,
     required this.senderName,
+    // required this.chatId,
     required this.isYou,
   });
 
   final String message;
+  // final int chatId;
   final bool isYou;
   final String senderName;
 

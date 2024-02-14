@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:logger/logger.dart';
 import 'package:service_hub/screen/auth/signup_screen.dart';
-import 'package:service_hub/screen/chat_screen.dart';
+// import 'package:service_hub/screen/chat_screen.dart';
 import 'package:service_hub/service/api_service.dart';
 import 'package:service_hub/widget/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';

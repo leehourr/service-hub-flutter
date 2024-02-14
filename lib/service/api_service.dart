@@ -102,13 +102,17 @@ class ApiService {
     }
   }
 
-  Future<http.Response> viewChat(
-      {required int chatId, required int userId, required String token}) async {
-    final url = Uri.http(baseUrl, '/api/v1/view-chat/$chatId/$userId');
+  Future<http.Response> viewChat({
+    required int senderId,
+    required int userId,
+  }) async {
+    final url = Uri.http(baseUrl, '/api/v1/view-chat/$senderId/$userId');
     // print('Name: $name');
     // print('Phone Number: $phoneNumber');
     // print('Password: $password');
     try {
+      String? token = await _getSavedToken();
+
       final response = await http.get(url, headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token'
@@ -120,14 +124,12 @@ class ApiService {
   }
 
   Stream<List<ChatMessage>> getChatStream({
-    required int chatId,
+    required int senderId,
     required int userId,
-    required String token,
   }) async* {
     while (true) {
       try {
-        final response =
-            await viewChat(chatId: chatId, userId: userId, token: token);
+        final response = await viewChat(senderId: senderId, userId: userId);
         final Map<String, dynamic> responseData = json.decode(response.body);
         final List<Map<String, dynamic>> messagesData =
             List<Map<String, dynamic>>.from(responseData['messages']);
@@ -136,13 +138,14 @@ class ApiService {
           return ChatMessage(
             message: messageData['message_text'],
             senderName: messageData['sender_name'],
+            // chatId: int.parse(messagesData['chat_id']),
             isYou: messageData['isYou'] ?? false,
           );
         }).toList();
 
         yield messages;
         await Future.delayed(
-            const Duration(seconds: 5)); // You can adjust the delay as needed
+            const Duration(seconds: 3)); // You can adjust the delay as needed
       } catch (e) {
         logger.e('Error loading chat: $e');
         yield []; // You can handle errors as needed
@@ -154,7 +157,7 @@ class ApiService {
   Future<http.Response> sendMessage({
     required String messageText,
     required int senderId,
-    required int chatId,
+    // required int chatId,
     required int userId,
   }) async {
     final url = Uri.http(baseUrl, 'api/v1/send-chat/$userId');
@@ -169,7 +172,7 @@ class ApiService {
         body: json.encode({
           'message_text': messageText.trim(),
           'sender_id': senderId,
-          'chat_id': chatId,
+          // 'chat_id': chatId,
         }),
       );
       return response;
@@ -182,6 +185,40 @@ class ApiService {
     // logger.e('token in api class $token');
     String? token = await _getSavedToken();
     final url = Uri.http(baseUrl, 'api/v1/chat-list/$userId');
+    try {
+      final response = await http.get(url, headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      });
+
+      return response;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  Future<http.Response> deleteChat({required int chatId}) async {
+    // logger.e('token in api class $token');
+    String? token = await _getSavedToken();
+    final url = Uri.http(baseUrl, 'api/v1/removechat/$chatId');
+    try {
+      final response = await http.delete(url, headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      });
+      logger.e('error deleting chat ${response.body}');
+
+      return response;
+    } catch (e) {
+      logger.e('error deleting chat $e');
+      throw Exception(e);
+    }
+  }
+
+  Future<http.Response> getServiceList() async {
+    // logger.e('token in api class $token');
+    String? token = await _getSavedToken();
+    final url = Uri.http(baseUrl, 'api/v1/service');
     try {
       final response = await http.get(url, headers: {
         'Content-Type': 'application/json',

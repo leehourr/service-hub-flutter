@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:service_hub/service/api_service.dart';
@@ -10,15 +12,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen(
-      {super.key,
-      required this.senderName,
-      required this.senderId,
-      required this.chatId});
+  const ChatScreen({
+    super.key,
+    required this.senderName,
+    required this.senderId,
+    // required this.chatId
+  });
 
   final String senderName;
   final int senderId;
-  final int chatId;
+  // final int chatId;
 
   @override
   State<ChatScreen> createState() => ChatScreenState();
@@ -34,9 +37,16 @@ class ChatScreenState extends State<ChatScreen> {
   late String _name;
 
   bool _isButtonDisabled = true;
+  late StreamSubscription<List<ChatMessage>> _chatSubscription;
   var logger = Logger();
 
   late ApiService _apiService;
+  @override
+  void dispose() {
+    _chatSubscription.cancel();
+    _textController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -48,8 +58,15 @@ class ChatScreenState extends State<ChatScreen> {
   Future<void> _initStateAsync() async {
     await _getUserId();
     _apiService = ApiService(token: _token);
-    await _loadChat();
-    // _loadChat(); // Call your API to load chat messages
+
+    _chatSubscription = _apiService
+        .getChatStream(senderId: widget.senderId, userId: userId)
+        .listen((List<ChatMessage> messages) {
+      setState(() {
+        _messages.clear();
+        _messages.addAll(messages.reversed);
+      });
+    });
   }
 
   Future<void> _getUserId() async {
@@ -71,7 +88,7 @@ class ChatScreenState extends State<ChatScreen> {
 
   Future<void> _loadChat() async {
     _apiService
-        .getChatStream(chatId: 18, userId: userId, token: _token)
+        .getChatStream(senderId: widget.senderId, userId: userId)
         .listen((List<ChatMessage> messages) {
       setState(() {
         _messages.clear();
@@ -103,22 +120,18 @@ class ChatScreenState extends State<ChatScreen> {
     }
 
     try {
+      logger.e('sender id ${widget.senderId}');
       final response = await _apiService.sendMessage(
         messageText: messageText,
         senderId: userId,
-        chatId: 18,
-        userId: 4,
+        userId: widget.senderId,
       );
 
-      // Handle the response as needed
-      // For example, you can check if the response was successful
       if (response.statusCode == 200) {
         _handleNewMessage([messageText], true);
-
-        logger.e('Message sent successfully');
       } else {
-        // Handle the case when the message sending fails
-        logger.e('Failed to send message. Status code: ${response.statusCode}');
+        // Handle the case where the API request was not successful
+        logger.e('Error sending message. Status code: ${response.statusCode}');
       }
     } catch (e) {
       // Handle exceptions or errors
@@ -126,7 +139,7 @@ class ChatScreenState extends State<ChatScreen> {
     }
 
     _textController.clear();
-    _loadChat();
+    // _loadChat(); // Commenting this out as it may cause duplicate messages
   }
 
   // Future<void> _logDecodedToken() async {
@@ -171,12 +184,7 @@ class ChatScreenState extends State<ChatScreen> {
           if (didPop) {
             return;
           }
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const ChatList(),
-            ),
-          );
+          Navigator.pop(context);
         },
         child: Scaffold(
           appBar: AppBar(

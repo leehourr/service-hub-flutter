@@ -61,23 +61,70 @@ class _ChatListState extends State<ChatList> {
     }
   }
 
+  Future<bool> showDeleteConfirmationDialog(
+      BuildContext context, String name) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Permanently delete chat for you and $name'),
+              // content: Text('This action cannot be undone.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pop(false); // Cancel the delete action
+                  },
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pop(true); // Confirm the delete action
+                  },
+                  child: Text('Delete'),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false; // Return false if the dialog is dismissed
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: ListView.builder(
-        itemCount: _chatList.length,
-        itemBuilder: (context, index) {
-          final chat = _chatList[index];
-          return ChatItem(
-            name: chat['name'],
-            lastText: chat['last_text'],
-            chatId: chat['chat_id'],
-            senderId: chat['user_id'],
-            firstLetter:
-                chat['name'] != null ? chat['name'][0].toUpperCase() : '',
-          );
-        },
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Message'),
+      ),
+      body: Container(
+        color: Colors.white,
+        child: ListView.builder(
+          itemCount: _chatList.length,
+          itemBuilder: (context, index) {
+            final chat = _chatList[index];
+            return ChatItem(
+              key: UniqueKey(),
+              name: chat['name'],
+              lastText: chat['last_text'],
+              chatId: chat['chat_id'],
+              senderId: chat['user_id'],
+              firstLetter:
+                  chat['name'] != null ? chat['name'][0].toUpperCase() : '',
+              onDismissed: () async {
+                bool confirmDelete =
+                    await showDeleteConfirmationDialog(context, chat['name']);
+                final int chatId = chat['chat_id'];
+                // logger.e(" chat id $chatId");
+                if (confirmDelete) {
+                  await apiService.deleteChat(chatId: chatId);
+                  return;
+                }
+                setState(() {});
+              },
+            );
+          },
+        ),
       ),
     );
   }
