@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+// import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:logger/logger.dart';
@@ -241,6 +242,38 @@ class ApiService {
         'Authorization': 'Bearer $token'
       });
 
+      return response;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  Future<http.Response> getBookingList() async {
+    // logger.e('token in api class $token');
+    String? token = await _getSavedToken();
+    final url = Uri.http(baseUrl, 'api/v1/booking-list');
+    try {
+      final response = await http.get(url, headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      });
+
+      return response;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  Future<http.Response> cancelBooking({required int bookingId}) async {
+    // logger.e('token in api class $token');
+    String? token = await _getSavedToken();
+    final url = Uri.http(baseUrl, 'api/v1/booking/$bookingId');
+    try {
+      final response = await http.delete(url, headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      });
+      Logger().e("response from api ${response.body}");
       return response;
     } catch (e) {
       throw Exception(e);

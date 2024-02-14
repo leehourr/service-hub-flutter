@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:logger/logger.dart';
-import 'package:service_hub/screen/auth/login_screen.dart';
-import 'package:service_hub/widget/home.dart';
+// import 'package:logger/logger.dart';
+// import 'package:service_hub/screen/auth/login_screen.dart';
+// import 'package:service_hub/widget/home.dart';
 import 'package:service_hub/widget/service_details.dart';
 
 class ServiceCard extends StatelessWidget {

@@ -82,7 +82,7 @@ class _ChatListState extends State<ChatList> {
                     Navigator.of(context)
                         .pop(true); // Confirm the delete action
                   },
-                  child: Text('Delete'),
+                  child: const Text('Delete'),
                 ),
               ],
             );

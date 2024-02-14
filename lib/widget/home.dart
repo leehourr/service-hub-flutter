@@ -4,6 +4,7 @@ import 'package:logger/logger.dart';
 import 'package:service_hub/screen/auth/login_screen.dart';
 import 'package:service_hub/screen/home_screen.dart';
 import 'package:service_hub/widget/auth/profile.dart';
+import 'package:service_hub/widget/booking_list.dart';
 import 'package:service_hub/widget/search_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -27,6 +28,7 @@ class _HomeScreenState extends State<Home> {
   late String? _name = '';
   late String? _number = '';
   late bool? _isLogin = false;
+  late bool? _isClient = false;
 
   @override
   void initState() {
@@ -47,11 +49,13 @@ class _HomeScreenState extends State<Home> {
         Map<String, dynamic> decodedToken = Jwt.parseJwt(token);
         final String name = decodedToken['data']['name'].toString();
         final String number = decodedToken['data']['phone_number'].toString();
+        final String isClient = decodedToken['data']['account_type'].toString();
 
         logger.e("token $token name $name $number");
         _name = name;
         _number = number;
         _isLogin = true;
+        _isClient = isClient == "client";
         return true;
       }
       return false;
@@ -113,9 +117,16 @@ class _HomeScreenState extends State<Home> {
           },
         ));
       case 2:
-        return const Center(
-            child:
-                Text('Books Content', style: TextStyle(color: Colors.black)));
+        return Center(
+            child: BookingList(
+          isLogin: _isLogin!,
+          isClient: _isClient!,
+          navigateToAccount: () {
+            setState(() {
+              _currentIndex = 4;
+            });
+          },
+        ));
       case 3:
         return const Center(
             child: Text('Appointment Content',

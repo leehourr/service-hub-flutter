@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:ffi';
+// import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -16,7 +16,7 @@ final List<String> categories = [
 ];
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen({
+  const HomeScreen({
     super.key,
     required this.userName,
     required this.isLogin,

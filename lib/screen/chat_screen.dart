@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:service_hub/service/api_service.dart';
 // import 'package:service_hub/widget/chat/chat_item.dart';
-import 'package:service_hub/widget/chat/chat_list.dart';
+// import 'package:service_hub/widget/chat/chat_list.dart';
 import 'package:service_hub/widget/chat/chat_message.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:service_hub/service/pusher_channel.dart';
@@ -86,16 +86,16 @@ class ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  Future<void> _loadChat() async {
-    _apiService
-        .getChatStream(senderId: widget.senderId, userId: userId)
-        .listen((List<ChatMessage> messages) {
-      setState(() {
-        _messages.clear();
-        _messages.addAll(messages.reversed);
-      });
-    });
-  }
+  // Future<void> _loadChat() async {
+  //   _apiService
+  //       .getChatStream(senderId: widget.senderId, userId: userId)
+  //       .listen((List<ChatMessage> messages) {
+  //     setState(() {
+  //       _messages.clear();
+  //       _messages.addAll(messages.reversed);
+  //     });
+  //   });
+  // }
 
   void _handleNewMessage(List<String> messages, bool isYou) async {
     setState(() {

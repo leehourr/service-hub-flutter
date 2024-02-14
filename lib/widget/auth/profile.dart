@@ -11,7 +11,7 @@ class Profile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+    final Future<SharedPreferences> prefs = SharedPreferences.getInstance();
     var logger = Logger();
 
     void navigateToHome() {
@@ -23,10 +23,10 @@ class Profile extends StatelessWidget {
       );
     }
 
-    Future<void> _signOut() async {
+    Future<void> signOut() async {
       try {
-        final SharedPreferences prefs = await _prefs;
-        await prefs.remove('jwt_token');
+        final SharedPreferences getToken = await prefs;
+        await getToken.remove('jwt_token');
         navigateToHome();
       } catch (e) {
         logger.e('Error signing out: $e');
@@ -121,7 +121,7 @@ class Profile extends StatelessWidget {
             // const Spacer(),
             // Sign out clickable text
             GestureDetector(
-              onTap: _signOut,
+              onTap: signOut,
               child: const Text(
                 'Sign Out',
                 style: TextStyle(
