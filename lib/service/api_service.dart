@@ -273,7 +273,24 @@ class ApiService {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token'
       });
-      Logger().e("response from api ${response.body}");
+      // Logger().e("response from api ${response.body}");
+      return response;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  Future<http.Response> bookService(
+      {required int providerId, required int serviceId}) async {
+    // logger.e('token in api class $token');
+    String? token = await _getSavedToken();
+    final url = Uri.http(baseUrl, 'api/v1/booking/$providerId/$serviceId');
+    try {
+      final response = await http.post(url, headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      });
+      // Logger().e("response from api ${response.body}");
       return response;
     } catch (e) {
       throw Exception(e);

@@ -85,6 +85,7 @@ class _ServiceSearchWidgetState extends State<ServiceSearch> {
         MaterialPageRoute(
           builder: (context) => ServiceDetailWidget(
               key: UniqueKey(),
+              serviceId: result['id'],
               imageUrl: result['image'],
               serviceName: result['service_name'],
               senderId: result['service_provider_id'],

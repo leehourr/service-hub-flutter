@@ -158,6 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         // key: Key(service['id'].toString()),
                         key: UniqueKey(),
                         isLogin: widget.isLogin,
+                        serviceId: service['id'],
                         imageUrl: service['image'],
                         serviceName: service['service_name'],
                         serviceProviderName: service['name'],

@@ -11,6 +11,7 @@ class ServiceCard extends StatelessWidget {
   final String serviceProviderName;
   final String description;
   final int providerId;
+  final int serviceId;
   final VoidCallback navigateToAccount;
 
   const ServiceCard({
@@ -21,6 +22,7 @@ class ServiceCard extends StatelessWidget {
     required this.serviceProviderName,
     required this.description,
     required this.providerId,
+    required this.serviceId,
     required this.navigateToAccount,
   });
 
@@ -34,6 +36,7 @@ class ServiceCard extends StatelessWidget {
               key: key,
               imageUrl: imageUrl,
               serviceName: serviceName,
+              serviceId: serviceId,
               senderId: providerId,
               serviceProviderName: serviceProviderName,
               description: description,

@@ -170,7 +170,7 @@ class BookingCard extends StatelessWidget {
 
     Color statusColor = getStatusColor(booking['status']);
 
-    String _formatDate(String dateString) {
+    String formatDate(String dateString) {
       DateTime dateTime = DateTime.parse(dateString);
       String formattedDate = DateFormat.yMMMMd().add_jms().format(dateTime);
       return formattedDate;
@@ -231,8 +231,7 @@ class BookingCard extends StatelessWidget {
                 ),
               ),
               Text('Provider: ${booking['provider_name']}'),
-              Text(
-                  'Book Date: ${_formatDate(booking['book_date']).toString()}'),
+              Text('Book Date: ${formatDate(booking['book_date']).toString()}'),
             ],
           ),
           trailing: Text(
