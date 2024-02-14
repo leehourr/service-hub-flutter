@@ -70,15 +70,20 @@ class _BookingListState extends State<BookingList> {
               if (widget.isClient) {
                 // Logger().e("booking id  ${booking['id']}");
                 // Client: Call Cancel function
-                bool confirm = await _showCancelBookingDialog(context);
+                bool confirm = await _showCancelBookingDialog(context, true);
                 if (confirm) {
                   await ApiService().cancelBooking(bookingId: booking['id']);
                   await getBooking();
                 }
                 setState(() {});
               } else {
-                // Service Provider: Call Decline function
-                // ApiService().declineBooking(booking['id']);
+                bool confirm = await _showCancelBookingDialog(context, false);
+                if (confirm) {
+                  await ApiService().acceptBooking(
+                      clientId: booking['client_id'], bookingId: booking['id']);
+                  await getBooking();
+                }
+                setState(() {});
               }
             });
       },
@@ -108,12 +113,14 @@ class _BookingListState extends State<BookingList> {
     );
   }
 
-  Future<bool> _showCancelBookingDialog(BuildContext context) async {
+  Future<bool> _showCancelBookingDialog(BuildContext context, isClient) async {
     return await showDialog<bool>(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Text('Are you sure you want to cancel?'),
+              title: Text(isClient
+                  ? "Are you sure you want to cancel?"
+                  : "Accept the booking."),
               // content: Text('This action cannot be undone.'),
               actions: [
                 TextButton(
@@ -179,11 +186,13 @@ class BookingCard extends StatelessWidget {
     return Dismissible(
       key: UniqueKey(),
       background: Container(
-        color: Colors.red, // Background color when swiping
+        color: !isClient
+            ? Colors.green
+            : Colors.red, // Background color when swiping
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 40.0),
         child: Text(
-          isClient ? 'Cancel' : 'Decline',
+          isClient ? 'Cancel' : 'Accept',
           style: const TextStyle(
             color: Colors.white,
             fontSize: 18.0,
@@ -198,8 +207,8 @@ class BookingCard extends StatelessWidget {
         }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-                "This booking is already ${isClient ? 'cancelled' : 'declinded'}"),
+            content:
+                Text("This booking is already ${booking['status'].toString()}"),
             duration: const Duration(seconds: 2),
           ),
         );

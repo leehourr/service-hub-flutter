@@ -3,6 +3,7 @@ import 'package:jwt_decode/jwt_decode.dart';
 import 'package:logger/logger.dart';
 import 'package:service_hub/screen/auth/login_screen.dart';
 import 'package:service_hub/screen/home_screen.dart';
+import 'package:service_hub/widget/appointment.dart';
 import 'package:service_hub/widget/auth/profile.dart';
 import 'package:service_hub/widget/booking_list.dart';
 import 'package:service_hub/widget/search_service.dart';
@@ -128,9 +129,16 @@ class _HomeScreenState extends State<Home> {
           },
         ));
       case 3:
-        return const Center(
-            child: Text('Appointment Content',
-                style: TextStyle(color: Colors.black)));
+        return Center(
+            child: AppointmentWidget(
+          isLogin: _isLogin!,
+          isClient: _isClient!,
+          navigateToAccount: () {
+            setState(() {
+              _currentIndex = 4;
+            });
+          },
+        ));
       case 4:
         return FutureBuilder<bool>(
           key: UniqueKey(),

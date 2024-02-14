@@ -296,4 +296,37 @@ class ApiService {
       throw Exception(e);
     }
   }
+
+  Future<http.Response> acceptBooking(
+      {required int clientId, required int bookingId}) async {
+    // logger.e('token in api class $token');
+    String? token = await _getSavedToken();
+    final url = Uri.http(baseUrl, 'api/v1/accept-booking/$clientId/$bookingId');
+    try {
+      final response = await http.post(url, headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      });
+      // Logger().e("response from api ${response.body}");
+      return response;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  Future<http.Response> appointmentList() async {
+    // logger.e('token in api class $token');
+    String? token = await _getSavedToken();
+    final url = Uri.http(baseUrl, 'api/v1/appointment-list');
+    try {
+      final response = await http.get(url, headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      });
+      // Logger().e("response from api ${response.body}");
+      return response;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
 }
