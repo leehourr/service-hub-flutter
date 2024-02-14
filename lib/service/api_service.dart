@@ -230,4 +230,20 @@ class ApiService {
       throw Exception(e);
     }
   }
+
+  Future<http.Response> searchService({required String search}) async {
+    // logger.e('token in api class $token');
+    String? token = await _getSavedToken();
+    final url = Uri.http(baseUrl, 'api/v1/search-service/$search');
+    try {
+      final response = await http.get(url, headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      });
+
+      return response;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
 }

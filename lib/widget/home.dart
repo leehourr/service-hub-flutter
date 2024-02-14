@@ -4,6 +4,7 @@ import 'package:logger/logger.dart';
 import 'package:service_hub/screen/auth/login_screen.dart';
 import 'package:service_hub/screen/home_screen.dart';
 import 'package:service_hub/widget/auth/profile.dart';
+import 'package:service_hub/widget/search_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
@@ -102,9 +103,15 @@ class _HomeScreenState extends State<Home> {
         );
 
       case 1:
-        return const Center(
-            child:
-                Text('Search Content', style: TextStyle(color: Colors.black)));
+        return Center(
+            child: ServiceSearch(
+          isLogin: _isLogin!,
+          navigateToAccount: () {
+            setState(() {
+              _currentIndex = 4;
+            });
+          },
+        ));
       case 2:
         return const Center(
             child:

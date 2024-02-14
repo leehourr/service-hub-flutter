@@ -7,15 +7,18 @@ class ServiceDetailWidget extends StatelessWidget {
   final String serviceProviderName;
   final int senderId;
   final String description;
+  final bool isLogin;
+  final VoidCallback navigateToAccount;
 
-  const ServiceDetailWidget({
-    super.key,
-    required this.imageUrl,
-    required this.senderId,
-    required this.serviceName,
-    required this.serviceProviderName,
-    required this.description,
-  });
+  const ServiceDetailWidget(
+      {super.key,
+      required this.imageUrl,
+      required this.senderId,
+      required this.serviceName,
+      required this.serviceProviderName,
+      required this.description,
+      required this.isLogin,
+      required this.navigateToAccount});
 
   @override
   Widget build(BuildContext context) {
@@ -51,12 +54,21 @@ class ServiceDetailWidget extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    // Implement book button logic
+                    if (!isLogin) {
+                      navigateToAccount();
+                      Navigator.pop(context);
+                      return;
+                    }
                   },
                   child: const Text('Book'),
                 ),
                 ElevatedButton(
                   onPressed: () {
+                    if (!isLogin) {
+                      navigateToAccount();
+                      Navigator.pop(context);
+                      return;
+                    }
                     Navigator.push(
                       context,
                       MaterialPageRoute(

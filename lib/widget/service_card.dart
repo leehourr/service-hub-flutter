@@ -31,23 +31,24 @@ class ServiceCard extends StatelessWidget {
         context,
         MaterialPageRoute(
           builder: (context) => ServiceDetailWidget(
-            key: key,
-            imageUrl: imageUrl,
-            serviceName: serviceName,
-            senderId: providerId,
-            serviceProviderName: serviceProviderName,
-            description: description,
-          ),
+              key: key,
+              imageUrl: imageUrl,
+              serviceName: serviceName,
+              senderId: providerId,
+              serviceProviderName: serviceProviderName,
+              description: description,
+              navigateToAccount: navigateToAccount,
+              isLogin: isLogin),
         ),
       );
     }
 
     return GestureDetector(
       onTap: () {
-        if (!isLogin) {
-          navigateToAccount();
-          return;
-        }
+        // if (!isLogin) {
+        //   navigateToAccount();
+        //   return;
+        // }
         navgiateToServiceDetail();
       },
       child: Container(
